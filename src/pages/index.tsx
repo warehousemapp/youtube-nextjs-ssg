@@ -1,23 +1,30 @@
 import { GetStaticProps } from "next";
+import Link from 'next/link'
 
-export default function Home({ org }) {
+export default function Home({dados}) {
   return (
-    <div>
-      <h1>{org.login}</h1>
-      <h3>{org.description}</h3>
-
-      <p>Site: <a href={org.blog}>{org.blog}</a></p>
-    </div>
-  )
-}
+    <>
+    {dados.map((arg) => (
+      <div key={arg.ID}>
+        <h2>
+          {arg.ID}-{arg.nome}
+        </h2>
+        <img src={arg.imagem} width="50" />
+        <Link href='/members/[login]' as={`/members/${arg.ID}`}>
+            <a>{arg.nome}</a>
+          </Link>
+      </div>
+    ))}
+  </>
+  )}
 
 export const getStaticProps: GetStaticProps = async () => {
-  const response = await fetch('https://api.github.com/orgs/rocketseat');
+  const response = await fetch('http://localhost:3001');
   const data = await response.json();
 
   return {
     props: {
-      org: data,
+      dados: data,
     },
     revalidate: 10
   }

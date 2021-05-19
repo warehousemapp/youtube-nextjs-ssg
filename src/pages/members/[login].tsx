@@ -1,32 +1,38 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
+import Link from 'next/link'
 
-export default function Member({ user }) {
+export default function Member({ dados }) {
   const { isFallback } = useRouter();
 
   if (isFallback) {
     return <p>Carregando...</p>;
   }
-
   return (
-    <div>
-      <img src={user.avatar_url} alt={user.name} width="80" style={{ borderRadius: 40 }} />
-      <h1>{user.name}</h1>
-      <p>{user.bio}</p>
-    </div>
-  )
-}
+  <>
+            <Link href='/'>
+            <a><h1>Home</h1></a>
+          </Link>
+      {dados.map((arg) => (
+        <div key={arg.ID}>
+          <h2>
+            {arg.ID}-{arg.nome}
+          </h2>
+          <img src={arg.imagem} width="50" />
+        </div>
+      ))}
+    </>
+  )}
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const response = await fetch(`https://api.github.com/orgs/rocketseat/members`);
+  /*const response = await fetch(`http://localhost:3001`);
   const data = await response.json();
-
   const paths = data.map(member => {
-    return { params: { login: member.login } }
-  });
+    return { params: { login: member.ID.slice(0,5) } }
+  });*/
 
   return {
-    paths,
+    paths: [ { params: { login: '1' } }, { params: { login: '2' } } ],
     fallback: true, 
   }
 }
@@ -34,12 +40,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async (context) => {
   const { login } = context.params;
 
-  const response = await fetch(`https://api.github.com/users/${login}`);
+  const response = await fetch(`http://localhost:3001/user/${login}`);
   const data = await response.json();
   
   return {
     props: {
-      user: data,
+      dados: data,
     },
     revalidate: 10,
   }
